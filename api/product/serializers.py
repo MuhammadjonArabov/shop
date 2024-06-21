@@ -57,22 +57,7 @@ class ProductPriceHistorySerializers(serializers.ModelSerializer):
 
     class Meta:
         model = ProductPriceHistory
-        fields = ['id', 'guid', 'product', 'recorder', 'newPrice', 'oldPrice']
-
-
-class ProductPriceHistoryListSerializers(serializers.ModelSerializer):
-    product = ProductShortSerializers()
-
-    class Meta:
-        model = ProductPriceHistory
-        fields = ['id', 'guid', 'product', 'recorder', 'newPrice', 'oldPrice']
-
-
-class ProductPriceHistoryDetailSerializers(serializers.ModelSerializer):
-
-    class Meta:
-        model = ProductPriceHistory
-        fields = ['id', 'guid', 'product', 'recorder', 'newPrice', 'oldPrice']
+        fields = ['product', 'recorder', 'newPrice', 'oldPrice']
 
 
 class WarehouseProductSerializers(serializers.ModelSerializer):
@@ -100,33 +85,6 @@ class WarehouseProductListSerializers(serializers.ModelSerializer):
     class Meta:
         model = WarehouseProduct
         fields = ['id', 'guid', 'product', 'recorder', 'quantity', 'unitPrice']
-
-
-class BackupWarehouseProductSerializers(serializers.ModelSerializer):
-    def validated_quantity(self, value):
-        if value is None or value <= 0:
-            raise serializers.ValidationError('Quantity must by greater than 0')
-        return value
-
-    def to_internal_value(self, data):
-        data = data.copy()
-        decimal_fields = ['quantity', 'unitPrice']
-        for field in decimal_fields:
-            if data.get(field) is not None and data.get(field) != 'null' and data.get(field) != "":
-                data[field] = round(Decimal(data[field]), 6)
-        return super().to_internal_value(data)
-
-    class Meta:
-        model = BackupWarehouseProduct
-        fields = ['id', 'guid', 'product', 'quantity', 'unitPrice']
-
-
-class BackupWarehouseProductListSerializers(serializers.ModelSerializer):
-    product = ProductShortSerializers()
-
-    class Meta:
-        model = BackupWarehouseProduct
-        fields = ['id', 'guid', 'product', 'quantity', 'unitPrice']
 
 
 class ProductShortSerializers(serializers.ModelSerializer):
