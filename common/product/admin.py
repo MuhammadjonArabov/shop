@@ -13,16 +13,6 @@ class ProductAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(BackupWarehouseProduct)
-class BackupWarehouseProductAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(ProductPriceHistory)
-class ProductPriceHistoryAdmin(admin.ModelAdmin):
-    pass
-
-
 @admin.register(WarehouseProduct)
 class WarehouseProductAdmin(admin.ModelAdmin):
     pass

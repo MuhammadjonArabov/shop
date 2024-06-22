@@ -47,6 +47,8 @@ class ProductShortSerializers(serializers.ModelSerializer):
 
 
 class ProductPriceHistorySerializers(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), required=True)
+
     def to_internal_value(self, data):
         data = data.copy()
         decimal_fields = ['newPrice', 'oldPrice']

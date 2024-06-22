@@ -4,6 +4,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from api.product.serializers import ProductShortSerializers
+from common.product.model import Product
 from common.sale.model import Sale, SaleProduct, SalePayment
 
 
@@ -47,6 +48,9 @@ class SaleListaSerializers(serializers.ModelSerializer):
 
 
 class SaleProductSerializers(serializers.ModelSerializer):
+    sale = serializers.PrimaryKeyRelatedField(queryset=Sale.objects.all(), required=True, write_only=True)
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), required=True)
+
     def validate_quantity(self, value):
         if value is None or value < 0:
             raise serializers.ValidationError("Quantitiy must be greater than 0")
@@ -62,7 +66,7 @@ class SaleProductSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = SaleProduct
-        fields = ['id', 'guid', 'sale', 'product', 'quantity', 'unitPrice', 'status']
+        fields = ['sale', 'product', 'quantity', 'unitPrice', 'status']
 
 
 class SaleProductListSerializers(serializers.ModelSerializer):
@@ -92,4 +96,3 @@ class SalePaymentSerializers(serializers.ModelSerializer):
     class Meta:
         model = SalePayment
         fields = ['id', 'guid', 'sale', 'code', 'amount', 'paymentType']
-

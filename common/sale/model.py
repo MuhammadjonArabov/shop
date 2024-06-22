@@ -48,6 +48,9 @@ class SaleProduct(BaseModel):
     unitPrice = models.DecimalField(max_digits=50, decimal_places=6, default=0)
     status = models.IntegerField(choices=SaleProductStatus.choices, default=SaleProductStatus.SOLD)
 
+    def __str__(self):
+        return f"{self.product}, {self.sale}"
+
 
 class SalePayment(BaseModel):
     sale = models.ForeignKey(Sale, related_name='saleSalePayment', on_delete=models.CASCADE, null=True, blank=True)
