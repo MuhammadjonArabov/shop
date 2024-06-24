@@ -9,7 +9,6 @@ from common.sale.model import Sale, SaleProduct, SalePayment
 
 
 class SaleSerializers(serializers.ModelSerializer):
-    from decimal import Decimal, InvalidOperation
 
     def to_internal_value(self, data):
         total_amount = data.get('totalAmount')
@@ -22,6 +21,11 @@ class SaleSerializers(serializers.ModelSerializer):
 
         data['totalAmount'] = round(total_amount, 6)
         return data
+
+    def create(self, validated_data):
+        validated_data.pop('quantity', None)
+        validated_data.pop('saleProducts', None)
+        return Sale.objects.create(**validated_data)
 
     class Meta:
         model = Sale

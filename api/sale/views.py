@@ -80,90 +80,38 @@ class SaleAPIView(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        saleProducts = request.data.get('saleProducts')
-        validation_messages, createSaleProduct, updateSaleProduct = [], [], []
+        saleProducts = request.data.get('saleProducts', [])
+        createSaleProducts = []
+        updateSaleProducts = []
+        validation_messages = []
 
-        serializer = self.serializer_class(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-
-        if saleProducts is None:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        for saleProduct in saleProducts:
-            product = Product.objects.filter(id=saleProduct.get('product')).first()
-            if product is None:
-                validation_messages.append(f"Product {saleProduct.get('product')} not found")
-                continue
-
-            quantity = saleProduct.get('quantity')
+        for saleProduct_data in saleProducts:
+            quantity = saleProduct_data.get('quantity')
             if quantity is None:
-                validation_messages.append(f"Quantity not found for product {saleProduct.get('product')}")
+                validation_messages.append(f'Quantity for product {saleProduct_data.get("product")} not found')
                 continue
 
-            saleProduct['sale'] = instance.id
-            obj = SaleProduct.objects.filter(id=saleProduct.get('id'), guid=saleProduct.get('guid')).first()
-            if obj is None:
-                sale_product_serializer = SaleProductSerializers(data=saleProduct)
+            saleProduct_data['sale'] = instance.id
+
+            sale_product_instance = SaleProduct.objects.filter(id=saleProduct_data.get('id')).first()
+            sale_product_serializer = SaleProductSerializers(instance=sale_product_instance, data=saleProduct_data,
+                                                             partial=True)
+
             if not sale_product_serializer.is_valid():
                 validation_messages.append(sale_product_serializer.errors)
                 continue
 
-            saleProduct = SaleProduct(**sale_product_serializer.validated_data)
-            createSaleProduct.append(saleProduct)
-            # continue
-        else:
-            sale_product_serializer = SaleProductSerializers(instance=obj, data=saleProduct, partial=True)
-            if not sale_product_serializer.is_valid():
-                validation_messages.append(sale_product_serializer.errors)
+            sale_product_instance = sale_product_serializer.save()
+            updateSaleProducts.append(sale_product_instance)
 
-            saleProduct = sale_product_serializer.save()
-            updateSaleProduct.append(saleProduct)
+        if validation_messages:
+            return Response(validation_messages, status=status.HTTP_400_BAD_REQUEST)
 
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-def update(self, request, *args, **kwargs):
-    instance = self.get_object()
-    saleProducts = request.data.get('saleProducts', [])
-    createSaleProducts = []
-    updateSaleProducts = []
-    validation_messages = []
+        if createSaleProducts:
+            SaleProduct.objects.bulk_create(createSaleProducts)
 
-    for saleProduct in saleProducts:
-        quantity = saleProduct.get('quantity')
-        if quantity is None:
-            validation_messages.append(f'Quantity {saleProduct.get("product")} not found')
-            continue
-
-        saleProduct['order'] = instance.id
-
-        obj = SaleProduct.objects.filter(id=saleProduct.get('id'), guid=saleProduct.get('guid')).first()
-        if obj is None:
-            sale_product_serializer = SaleProductSerializers(data=saleProduct)
-            if not sale_product_serializer.is_valid():
-                validation_messages.append(sale_product_serializer.errors)
-                continue
-
-            saleProduct = SaleProduct(**sale_product_serializer.validated_data)
-            createSaleProducts.append(saleProduct)
-        # continue
-        else:
-            sale_product_serializer = SaleProductSerializers(instance=obj, data=saleProduct, partial=True)
-            if not sale_product_serializer.is_valid():
-                validation_messages.append(sale_product_serializer.errors)
-                continue
-
-        saleProduct = sale_product_serializer.save()
-        updateSaleProducts.append(saleProduct)
-
-    if validation_messages:
-        return Response(validation_messages, status=status.HTTP_400_BAD_REQUEST)
-
-    serializer = self.get_serializer(instance, data=request.data, partial=True)
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
-
-    if updateSaleProducts:
-        SaleProduct.objects.bulk_update(updateSaleProducts, ['quantity'])
-    if createSaleProducts:
-        SaleProduct.objects.bulk_create(createSaleProducts)
-
-    return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
