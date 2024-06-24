@@ -1,9 +1,11 @@
+from django.db import transaction
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from api.product.serializers import (ProductSerializers, CategorySerializer, WarehouseProductSerializers,
                                      ProductPriceHistorySerializers, ProductListSerializers,
-                                     ProductDetailSerializers, WarehouseProductListSerializers)
+                                     ProductDetailSerializers, WarehouseProductListSerializers,
+                                     WarehouseProductDetailtSerializers)
 from common.product.model import Product, ProductPriceHistory, WarehouseProduct, BackupWarehouseProduct, Category
 
 
@@ -31,9 +33,18 @@ class WarehouseProductAPIView(viewsets.ModelViewSet):
     serializer_class = WarehouseProductSerializers  # ProductPriceHistoryAPIView
     lookup_field = 'guid'
 
-    def list(self, request, *args, **kwargs):
-        self.serializer_class = WarehouseProductListSerializers
-        return super().list(request, *args, **kwargs)
+    # def list(self, request, *args, **kwargs):
+    #     self.serializer_class = WarehouseProductListSerializers
+    #     return super().list(request, *args, **kwargs)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return WarehouseProductListSerializers
+        return WarehouseProductSerializers
+
+    def retrieve(self, request, *args, **kwargs):
+        self.serializer_class = WarehouseProductDetailtSerializers
+        return super().retrieve(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         priceProducts = request.data.get('priceProducts')

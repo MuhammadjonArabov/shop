@@ -89,6 +89,12 @@ class WarehouseProductListSerializers(serializers.ModelSerializer):
         fields = ['id', 'guid', 'product', 'recorder', 'quantity', 'unitPrice']
 
 
+class WarehouseProductDetailtSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = WarehouseProduct
+        fields = ['id', 'guid', 'product', 'recorder', 'quantity', 'unitPrice']
+
+
 class ProductShortSerializers(serializers.ModelSerializer):
     class Meta:
         model = Product
