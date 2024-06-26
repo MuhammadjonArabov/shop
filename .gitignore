@@ -275,3 +275,4 @@ dump.rdb
 new_shop/media/
 
 .pytest_cache/
+.env
