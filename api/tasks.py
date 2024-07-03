@@ -9,13 +9,14 @@ def product_celery_task(product_id, new_price):
         product = Product.objects.get(id=product_id)
         old_price = product.price
 
-        if old_price != new_price:
+        if new_price != old_price:
             ProductPriceHistory.objects.create(
                 product=product,
                 recorder=product.recorder,
-                newPrice=new_price,
-                oldPrice=old_price
+                oldPrice=old_price,
+                newPrice=new_price
             )
+
         BackupWarehouseProduct.objects.create(
             product=product,
             quantity=0,
@@ -23,4 +24,4 @@ def product_celery_task(product_id, new_price):
         )
         return product.title
     except Product.DoesNotExist:
-        return f"Product with id {product_id} does not exist."
+        return f"Product with id {product_id} does not exist"

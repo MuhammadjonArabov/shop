@@ -23,12 +23,10 @@ class ProductAPIView(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         product = serializer.save()
         new_price = product.price
-        print(product.id)
         product_celery_task.apply_async([product.id, new_price])
-        print(f"celeri id:  {product.id}")
 
     def list(self, request, *args, **kwargs):
-        self.serializer_class = ProductListSerializers
+        self.serializer_class = ProductListSerializers  # apply_async
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
