@@ -21,7 +21,7 @@ class ProductListSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'guid', 'title', 'photo', 'uom', 'category', 'recorder']
+        fields = ['id', 'guid', 'title', 'photo', 'uom', 'category', 'recorder', 'price']
 
 
 class ProductDetailSerializers(serializers.ModelSerializer):
@@ -29,7 +29,7 @@ class ProductDetailSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'guid', 'title', 'photo', 'uom', 'category', 'recorder']
+        fields = ['id', 'guid', 'title', 'photo', 'uom', 'category', 'recorder', 'price']
 
 
 class ProductSerializers(serializers.ModelSerializer):
@@ -37,13 +37,13 @@ class ProductSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'guid', 'title', 'photo', 'uom', 'category', 'recorder']
+        fields = ['id', 'guid', 'title', 'photo', 'uom', 'category', 'recorder', 'price']
 
 
 class ProductShortSerializers(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'guid', 'title', 'category', 'recorder']
+        fields = ['id', 'guid', 'title']
 
 
 class ProductPriceHistorySerializers(serializers.ModelSerializer):

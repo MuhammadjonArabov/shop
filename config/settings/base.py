@@ -72,7 +72,7 @@ DJANGO_APPS = [
     "django.forms",
 ]
 THIRD_PARTY_APPS = [
-     "crispy_forms",
+    "crispy_forms",
     "crispy_bootstrap5",
     "allauth",
     "allauth.account",
@@ -85,7 +85,8 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "drf_spectacular",
     'django_filters',
-    'drf_base64'
+    'drf_base64',
+    'django_celery_beat',
 ]
 
 LOCAL_APPS = [
@@ -182,7 +183,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                #"new_shop.users.context_processors.allauth_settings",
+                # "new_shop.users.context_processors.allauth_settings",
             ],
         },
     },

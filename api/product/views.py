@@ -1,6 +1,7 @@
 from django.db import transaction
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from api.tasks import product_celery_task
 
 from api.product.serializers import (ProductSerializers, CategorySerializer, WarehouseProductSerializers,
                                      ProductPriceHistorySerializers, ProductListSerializers,
@@ -19,6 +20,13 @@ class ProductAPIView(viewsets.ModelViewSet):
     queryset = Product.objects.select_related("uom")
     serializer_class = ProductSerializers
 
+    def perform_create(self, serializer):
+        product = serializer.save()
+        new_price = product.price
+        print(product.id)
+        product_celery_task.apply_async([product.id, new_price])
+        print(f"celeri id:  {product.id}")
+
     def list(self, request, *args, **kwargs):
         self.serializer_class = ProductListSerializers
         return super().list(request, *args, **kwargs)
@@ -33,14 +41,9 @@ class WarehouseProductAPIView(viewsets.ModelViewSet):
     serializer_class = WarehouseProductSerializers  # ProductPriceHistoryAPIView
     lookup_field = 'guid'
 
-    # def list(self, request, *args, **kwargs):
-    #     self.serializer_class = WarehouseProductListSerializers
-    #     return super().list(request, *args, **kwargs)
-
-    def get_serializer_class(self):
-        if self.action == 'list':
-            return WarehouseProductListSerializers
-        return WarehouseProductSerializers
+    def list(self, request, *args, **kwargs):
+        self.serializer_class = WarehouseProductListSerializers
+        return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         self.serializer_class = WarehouseProductDetailtSerializers

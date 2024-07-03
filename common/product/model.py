@@ -15,6 +15,7 @@ class Category(BaseModel):
 class Product(BaseModel):
     title = models.CharField(max_length=150)
     photo = models.ImageField(upload_to='productImage', null=True, blank=True)
+    price = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     uom = models.ForeignKey(Uom, related_name='uomProduct', on_delete=models.CASCADE, null=True, blank=True)
     category = models.ForeignKey(Category, related_name='categoryProduct', on_delete=models.SET_NULL,
                                  null=True, blank=True)
@@ -33,8 +34,9 @@ class WarehouseProduct(BaseModel):
     quantity = models.DecimalField(max_digits=20, decimal_places=6, default=0)
     unitPrice = models.DecimalField(max_digits=20, decimal_places=6, default=0)
 
+
     def __str__(self):
-        return self.quantity
+        return self.product.title
 
 
 class ProductPriceHistory(BaseModel):
@@ -46,7 +48,7 @@ class ProductPriceHistory(BaseModel):
     oldPrice = models.DecimalField(max_digits=50, decimal_places=6, default=0)
 
     def __str__(self):
-        return self.newPrice
+        return self.product.title
 
 
 class BackupWarehouseProduct(BaseModel):
@@ -56,4 +58,4 @@ class BackupWarehouseProduct(BaseModel):
     unitPrice = models.DecimalField(max_digits=50, decimal_places=6, default=0)
 
     def __str__(self):
-        return self.quantity
+        return self.product.title
